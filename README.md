@@ -5,7 +5,7 @@
 
 [Project Jupyter](https://jupyter.org/) Datascience Notebook with a few added packages for use in [CyVerse Discovery Environment](https://de.cyverse.org)
 
-Jupyter Lab Datascience image built from the [Datascience Notebook](https://hub.docker.com/r/jupyter/datascience-notebook) for [CyVerse VICE](https://cyverse-visual-interactive-computing-environment.readthedocs-hosted.com/en/latest/index.html). Project Jupyter's base image requires a couple additional configuration files for it be compatible with CyVerse Kubernetes orchestration and iRODS data store.
+Jupyter Lab Datascience image built from the [Datascience Notebook](https://hub.docker.com/r/jupyter/datascience-notebook) for [CyVerse VICE](https://learning.cyverse.org/vice/about/). Project Jupyter's base image requires a couple additional configuration files for it be compatible with CyVerse Kubernetes orchestration and iRODS data store.
 
 [![!Harbor](https://github.com/cyverse-vice/jupyterlab-datascience/actions/workflows/harbor.yml/badge.svg)](https://github.com/cyverse-vice/jupyterlab-datascience/actions) ![GitHub commits since tagged version](https://img.shields.io/github/commits-since/cyverse-vice/jupyterlab-datascience/latest/main?style=flat-square) 
 
