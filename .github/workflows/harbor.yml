@@ -2,15 +2,12 @@ name: harbor
 
 on:
   push:
-    branches: main
+    branches: [main]
 
 jobs:
-  
-  build:
+  build_datascience:
     runs-on: ubuntu-latest
-    
     steps:
-    
       - name: Checkout
         uses: actions/checkout@v2
       
@@ -45,18 +42,48 @@ jobs:
           tags: harbor.cyverse.org/vice/jupyter/datascience:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
+  
+  build_depedent_images:
+    runs-on: ubuntu-latest
+    needs: build_datascience
+    strategy:
+      fail-fast: false
+      matrix:
+        container: [earthlab, geospatial, rstudio]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       
-      - name: Build and push earthlab
-        id: docker_build_earthlab
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      - name: Login to harbor
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: harbor.cyverse.org
+          username: ${{ secrets.HARBOR_USERNAME }}
+          password: ${{ secrets.HARBOR_PASSWORD }}
+      
+      - name: Build and push ${{ matrix.container }}
+        id: docker_build_${{ matrix.container }}
         uses: docker/build-push-action@v2.6.1
         with:
-          context: earthlab 
-          file: earthlab/Dockerfile
+          context: ${{ matrix.container }}
+          file: ${{ matrix.version }}/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: harbor.cyverse.org/vice/jupyter/earthlab:latest
+          tags: harbor.cyverse.org/vice/jupyter/${{ matrix.version }}:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
-          
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+      
